@@ -149,7 +149,7 @@ predictBtn.addEventListener("click", async () => {
       predictBtn.innerHTML = "Predict";
       predictBtn.disabled = false;
     }
-  }, 1000); // Simulating a 2-second API response time
+  }, 300); // Simulating a 2-second API response time
 });
 
 // function fakeApiCall() {
@@ -183,12 +183,14 @@ async function callApi(file) {
   formData.append("file", file);
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/predict", {
+    const response = await fetch("https://desktop-application-30h8.onrender.com/predict", {
+    //const response = await fetch("http://127.0.0.1:5000/predict", {
       method: "POST",
       body: formData,
     });
-
+    console.log(response)
     const data = await response.json();
+    console.log(data)
     return data.prediction; // Extract prediction result
   } catch (error) {
     console.log(error)

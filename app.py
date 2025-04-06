@@ -1,17 +1,35 @@
 from flask import Flask, request, jsonify, render_template
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
 import numpy as np
 from PIL import Image
 from flask_cors import CORS
 import io
 import cv2
+import gdown
+
 
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Load the trained Keras model for skin cancer classification
-model = tf.keras.models.load_model("best_model_2.keras")
+# Model setup
+MODEL_PATH = "best_model_2.keras"
+DRIVE_FILE_ID = "14i3LvHBOZJGNceQ-FJ7V-QK_aQiATO2q"  # 👈 Replace this with your file ID
+
+def download_model():
+    if not os.path.exists("models"):
+        os.makedirs("models")
+    if not os.path.exists(MODEL_PATH):
+        print("Downloading model from Google Drive...")
+        url = f"https://drive.google.com/uc?id={DRIVE_FILE_ID}"
+        gdown.download(url, MODEL_PATH, quiet=False)
+
+# Download and load the trained Keras model for skin cancer classification
+
+
+model = tf.keras.models.load_model(MODEL_PATH)
 
 # Define class labels for skin cancer classification
 class_labels = ["0", "1", "2", "3", "4", "5", "6"]
@@ -59,6 +77,7 @@ def preprocess_image(img):
     return new_im
 
 def detect_skin(image_np):
+    print('here')
     """Detects if skin is present in the image using OpenCV."""
     image_hsv = cv2.cvtColor(image_np, cv2.COLOR_RGB2HSV)  # Convert to HSV
 
