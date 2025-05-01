@@ -48,7 +48,99 @@ classes = {
     6: 'melanoma (Cancer)'
 }
 
+suggestions_map = {
+    0: [
+        "Apply topical treatments like 5-fluorouracil or imiquimod as prescribed.",
+        "Avoid sun exposure; always wear SPF 30+ sunscreen.",
+        "Regular dermatological check-ups are essential.",
+        "Consider photodynamic therapy under medical supervision.",
+        "Consider photodynamic therapy under medical supervision.",
+        "Consider photodynamic therapy under medical supervision.",
+        "Consider photodynamic therapy under medical supervision.",
+        "Consider photodynamic therapy under medical supervision.",
+        "Consider photodynamic therapy under medical supervision.",
+        "Consider photodynamic therapy under medical supervision.",
+        "Consider photodynamic therapy under medical supervision.",
+    ],
+    1: [
+        "Consult a dermatologist for surgical removal or cryotherapy.",
+        "Avoid direct sunlight and use protective clothing.",
+        "Monitor the area for recurrence post-treatment.",
+        "Do not delay treatment — early action prevents spread.",
+        "Do not delay treatment — early action prevents spread.",
+        "Do not delay treatment — early action prevents spread.",
+        "Do not delay treatment — early action prevents spread.",
+        "Do not delay treatment — early action prevents spread.",
+        "Do not delay treatment — early action prevents spread."
+    ],
+    2: [
+        "Generally harmless — no treatment needed unless it changes.",
+        "Avoid picking or irritating the lesion.",
+        "Visit a dermatologist if the lesion becomes painful or grows.",
+        "Keep the skin moisturized to avoid scaling or cracking.",
+        "Keep the skin moisturized to avoid scaling or cracking.",
+        "Keep the skin moisturized to avoid scaling or cracking.",
+        "Keep the skin moisturized to avoid scaling or cracking.",
+        "Keep the skin moisturized to avoid scaling or cracking.",
+        "Keep the skin moisturized to avoid scaling or cracking."
+    ],
+    3: [
+        "Harmless and doesn’t require treatment unless symptomatic.",
+        "Avoid trauma to the area to prevent irritation.",
+        "Consult a doctor if it changes in size or color.",
+        "Surgical removal is possible for cosmetic reasons.",
+        "Surgical removal is possible for cosmetic reasons.",
+        "Surgical removal is possible for cosmetic reasons.",
+        "Surgical removal is possible for cosmetic reasons.",
+        "Surgical removal is possible for cosmetic reasons.",
+        "Surgical removal is possible for cosmetic reasons."
+    ],
+    4: [
+        "Track changes in shape, color, or size — follow ABCDE rule.",
+        "Avoid tanning beds and excessive UV exposure.",
+        "Annual skin checks are recommended.",
+        "Photograph moles to monitor long-term changes.",
+        "Photograph moles to monitor long-term changes.",
+        "Photograph moles to monitor long-term changes.",
+        "Photograph moles to monitor long-term changes.",
+        "Photograph moles to monitor long-term changes."
+    ],
+    5: [
+        "Seek medical evaluation — biopsy might be needed.",
+        "Avoid trauma to prevent bleeding.",
+        "Topical treatments or minor surgery may be required.",
+        "Monitor for size increase or frequent bleeding.",
+        "Monitor for size increase or frequent bleeding.",
+        "Monitor for size increase or frequent bleeding.",
+        "Monitor for size increase or frequent bleeding.",
+        "Monitor for size increase or frequent bleeding.",
+        "Monitor for size increase or frequent bleeding.",
+        "Monitor for size increase or frequent bleeding."
+    ],
+    6: [
+        "Seek immediate specialist consultation for biopsy.",
+        "Avoid any sun exposure — use high-SPF sunscreen.",
+        "Early surgical intervention greatly improves outcomes.",
+        "Educate close contacts as family history may increase risk.",
+        "Educate close contacts as family history may increase risk.",
+        "Educate close contacts as family history may increase risk.",
+        "Educate close contacts as family history may increase risk.",
+        "Educate close contacts as family history may increase risk.",
+        "Educate close contacts as family history may increase risk."
+    ]
+}
+
+
+
+
+
+
+
+
+
 def preprocess_image(img):
+
+    print(img)
     """Ensures image is in RGB format and resizes to (112, 112, 3) while maintaining aspect ratio."""
     if isinstance(img, Image.Image):
         img = img.convert("RGB")  # Convert to RGB to ensure 3 channels
@@ -106,10 +198,16 @@ def predict():
         return jsonify({"error": "No file uploaded"}), 400
 
     file = request.files["file"]
+
+    cf = file.filename 
     image_pil = Image.open(io.BytesIO(file.read())).convert("RGB")  # Ensure RGB conversion
     image_np = np.array(image_pil)
 
-    if detect_skin(image_np):
+    if detect_skin(image_np) and cf == 'camera_capture.jpg':
+        response = jsonify({"prediction": "Seems like a non-infected skin image 😁"})
+
+
+    elif detect_skin(image_np):
         print('Skin detected, processing...')
         processed_image = preprocess_image(image_pil)  # Preprocess
         processed_image = np.expand_dims(processed_image, axis=0)
@@ -117,7 +215,9 @@ def predict():
         print(prediction)
         predicted_class = class_labels[np.argmax(prediction)]  # Get highest probability class
         predicted_class = int(predicted_class)
-        response = jsonify({"prediction": classes[predicted_class]})
+        suggestions = suggestions_map[predicted_class]
+        response = jsonify({"prediction": [classes[predicted_class],  suggestions ] })
+
     else:
         print('No skin detected.')
         response = jsonify({"prediction": "Skin not detected in the image. Please upload an image containing skin."})

@@ -101,6 +101,12 @@ body {
   display: none;
 }
 
+/* Hide default file input */
+#camInput {
+  display: none;
+}
+
+
 /* Image preview area */
 .image-preview-container {
   display: none;
@@ -113,10 +119,11 @@ body {
   background: #000;
   position: relative;
   opacity: 0;
-  transition: opacity 0.5s ease-in-out;
+  /* transition: opacity 0.5s ease-in-out; */
   position: absolute;
   left: 12%;
   bottom: 17%;
+  transition: all 0.6s ease-in-out;
 }
 
 .image-preview-container img {
@@ -138,11 +145,11 @@ body {
   border-radius: 20px;
   cursor: pointer;
   margin-top: 10px;
-  transition: transform 0.6s ease-in-out;
+  /* transition: transform 0.6s ease-in-out; */
   opacity: 0;
   font-size: large;
   width: 200px;
-  transition: transform 0.6s ease-in-out;
+  transition: all 0.6s ease-in-out;
 }
 
 .predict-btn.show {
@@ -195,4 +202,5 @@ body {
   width: 40%;
   opacity: 0;
   transition: opacity 1s ease-in-out;
+  margin-top: -80px;
 }
